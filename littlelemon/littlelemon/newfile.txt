@@ -1,1 +1,4 @@
-Hello World.
+
+admin username: admin
+admin email: admin@littlelemon.com
+admin password: lemon@789!
