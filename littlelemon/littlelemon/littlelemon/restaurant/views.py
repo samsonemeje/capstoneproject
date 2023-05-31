@@ -1,26 +1,30 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from rest_framework import generics
 
 from .models import Menu
+from .models import MenuItem
 from django.core import serializers
+from .serializers import MenuSerializer
+from .serializers import MenuItemSerializer
+
+from rest_framework.decorators import api_view
 from .models import Booking
 from datetime import datetime
 import json
-# from .forms import BookingForm
+from .forms import BookingForm
 
-# Create your views here.
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
+# function to return home page.
 def home(request):
  return render(request, 'index.html', {})
 
-# def alternateindex(request):
-#  return render(request, 'alternateindex.html', {})
-
-# function to return about view
+# function to return about page view
 def about(request):
     return render(request, 'about.html')
 
-# function to make booking by posting data
+# function to make a reservation
 def book(request):
     form = BookingForm()
     if request.method == 'POST':
@@ -30,7 +34,9 @@ def book(request):
     context = {'form':form}
     return render(request, 'book.html', context)
 
-# function to display menu items
+# function to display menu items list
+@api_view()
+@permission_classes([IsAuthenticated])
 def menu(request):
     menu_data = Menu.objects.all()
     main_data = {"menu": menu_data}
@@ -45,8 +51,9 @@ def display_menu_item(request, pk=None):
     return render(request, 'menu_item.html', {"menu_item": menu_item}) 
 
 # function to view bookings
-def booking(request):
+def bookings(request):
     date = request.GET.get('date', datetime.today().date())
     bookings = Booking.objects.all()
-    booking_json = serializers.serialize('json', bookings)
-    return render(request, 'bookings.html', {"bookings": booking_json})
+    #booking_json = serializers.serialize('json', bookings)
+    return render(request, 'bookings.html', {"bookings": bookings, "date": date})
+
